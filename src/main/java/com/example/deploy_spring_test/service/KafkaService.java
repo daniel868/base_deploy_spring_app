@@ -32,7 +32,7 @@ public class KafkaService {
         KafkaConsumerRun kafkaConsumerRun = new KafkaConsumerRun(consumer, kafkaConfig);
         kafkaConsumerRun.addKafkaHandler(testEventKafkaHandler);
 
-//        executorService.submit(kafkaNotifierRun);
-//        executorService.submit(kafkaConsumerRun);
+        executorService.submit(kafkaNotifierRun);
+        executorService.submit(kafkaConsumerRun);
     }
 }
