@@ -22,8 +22,6 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private ApplicationContext applicationContext;
 
     @Override
     public User addUser(String username) {
