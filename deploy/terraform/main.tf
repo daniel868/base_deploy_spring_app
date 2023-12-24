@@ -77,11 +77,6 @@ resource "kubernetes_deployment" "api_pod" {
               name = "api-config"
             }
           }
-
-          #          env {
-          #            name  = "SPRING_PROFILES_ACTIVE"
-          #            value = "k8s"
-          #          }
         }
       }
     }
@@ -144,8 +139,9 @@ resource "kubernetes_service" "api_service" {
     }
     type = "LoadBalancer"
     port {
-      port        = 8080
+      port        = 80
       target_port = 8080
+      node_port   = 31000
     }
   }
 }

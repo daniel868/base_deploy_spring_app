@@ -17,6 +17,10 @@ module "eks" {
     create_security_group = false
   }
 
+  node_security_group_tags = {
+    "kubernetes.io/cluster/${local.cluster_name}" = null
+  }
+
   eks_managed_node_groups = {
     one = {
       name = "node-group-1"
