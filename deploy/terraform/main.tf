@@ -19,46 +19,167 @@ resource "random_string" "suffix" {
   special = false
 }
 
-resource "kubernetes_deployment" "test" {
+resource "kubernetes_config_map" "api_config" {
   metadata {
-    name = "nginx"
+    name = "api-config"
   }
+  data = {
+    SPRING_PROFILES_ACTIVE = "k8s"
+  }
+}
+
+resource "kubernetes_config_map" "db-config" {
+  metadata {
+    name = "db-config"
+  }
+  data = {
+    POSTGRES_USER     = "admin"
+    POSTGRES_PASSWORD = "admin"
+  }
+}
+
+resource "kubernetes_deployment" "api_pod" {
+  metadata {
+    name   = "api-pod"
+    labels = {
+      app = "api-pod"
+    }
+  }
+
   spec {
     replicas = 2
+
     selector {
       match_labels = {
-        app = "MyTestApp"
+        app = "api-pod"
       }
     }
+
     template {
       metadata {
+        name   = "api-pod"
         labels = {
-          app = "MyTestApp"
+          app = "api-pod"
         }
       }
+
       spec {
         container {
-          image = "nginx"
-          name  = "nginx-container"
+          name  = "api-pod"
+          image = "alexandrudaniel/my-spring-app:latest"
+
           port {
-            container_port = 80
+            container_port = 8080
           }
+
+          env_from {
+            config_map_ref {
+              name = "api-config"
+            }
+          }
+
+          #          env {
+          #            name  = "SPRING_PROFILES_ACTIVE"
+          #            value = "k8s"
+          #          }
         }
       }
     }
   }
 }
-resource "kubernetes_service" "test" {
+
+resource "kubernetes_deployment" "postgresql" {
   metadata {
-    name = "nginx"
+    name   = "postgresql"
+    labels = {
+      app = "postgresql"
+    }
+  }
+  spec {
+    replicas = 1
+
+    selector {
+      match_labels = {
+        app = "postgresql"
+      }
+    }
+
+    template {
+      metadata {
+        name   = "postgresql"
+        labels = {
+          app = "postgresql"
+        }
+      }
+
+      spec {
+        container {
+          name              = "postgresql"
+          image             = "postgres:10.4"
+          image_pull_policy = "IfNotPresent"
+
+          port {
+            container_port = 5432
+          }
+
+          env_from {
+            config_map_ref {
+              name = "db-config"
+            }
+          }
+
+        }
+      }
+    }
+  }
+}
+
+resource "kubernetes_service" "api_service" {
+  metadata {
+    name = "api-service"
   }
   spec {
     selector = {
-      app = kubernetes_deployment.test.spec.0.template.0.metadata.0.labels.app
+      app = "api-pod"
     }
-    type = "NodePort"
+    type = "LoadBalancer"
     port {
-      port = 80
+      port        = 8080
+      target_port = 8080
     }
   }
 }
+
+resource "kubernetes_service" "db-service" {
+  metadata {
+    name   = "db-service"
+    labels = {
+      app = "postgresql"
+    }
+  }
+  spec {
+    selector = {
+      app = "postgresql"
+    }
+
+    type = "ClusterIP"
+    port {
+      port = 5432
+    }
+  }
+}
+
+#resource "kubernetes_persistent_volume_claim" "postgres-pv-volume" {
+#  metadata {
+#    name = "postgres-pv-volume"
+#  }
+#  spec {
+#    storage_class_name = "manual"
+#    access_modes       = ["ReadWriteOnce"]
+#    resources {
+#      requests = {
+#        storage = "1Gi"
+#      }
+#    }
+#  }
+#}
