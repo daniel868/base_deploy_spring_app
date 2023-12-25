@@ -15,6 +15,8 @@ public class DeploySpringTestApplication {
 
     @Value("${selected.environment}")
     private String selectedEnvironment;
+    @Value("${kafka.host}")
+    private String kafkaHost;
 
     public static void main(String[] args) {
         SpringApplication.run(DeploySpringTestApplication.class, args);
@@ -24,6 +26,7 @@ public class DeploySpringTestApplication {
     CommandLineRunner runner(UserRepository userRepository) {
         return args -> {
             logger.debug("Selected environment: {}", selectedEnvironment);
+            logger.debug("Kafka host: {}", kafkaHost);
         };
     }
 
