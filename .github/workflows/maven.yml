@@ -30,8 +30,8 @@ jobs:
       - name: Build with Maven
         run: mvn clean install -DskipTests
 
-      - name: Build & push to docker hub
-        uses: actions/checkout@v4
+      - uses: mr-smithers-excellent/docker-build-push@v6
+        name: Build & push Docker image
         with:
           image: alexandrudaniel/my-spring-app:latest
           tags: latest
