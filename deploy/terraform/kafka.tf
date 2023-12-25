@@ -122,7 +122,7 @@ resource "kubernetes_config_map" "kafka-config" {
   }
   data = {
     KAFKA_BROKER_ID         = "1"
-    KAFKA_ZOOKEEPER_CONNECT = "172.20.233.188"
+    KAFKA_ZOOKEEPER_CONNECT = "172.20.45.62"
     KAFKA_LISTENERS         = "PLAINTEXT://:9092"
     KAFKA_ADVERTISED_LISTENERS : "PLAINTEXT://localhost:9092"
   }
