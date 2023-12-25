@@ -32,8 +32,9 @@ jobs:
 
       - name: Build & push to docker hub
         uses: actions/checkout@v4
-        with: alexandrudaniel/my-spring-app:latest
-        tags: latest
-        registry: docker.io
-        username: ${{ secrets.DOCKER_USERNAME}}
-        password: ${{ secrets.DOCKER_PASSWORD}}
+        with:
+          image: alexandrudaniel/my-spring-app:latest
+          tags: latest
+          registry: docker.io
+          username: ${{ secrets.DOCKER_USERNAME}}
+          password: ${{ secrets.DOCKER_PASSWORD}}
