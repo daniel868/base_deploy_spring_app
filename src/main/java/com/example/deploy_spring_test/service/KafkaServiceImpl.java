@@ -7,6 +7,7 @@ import com.example.deploy_spring_test.handlers.TestEventKafkaHandler;
 import jakarta.annotation.PostConstruct;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ExecutorService;
@@ -26,13 +27,18 @@ public class KafkaServiceImpl implements KafkaService {
     @Autowired
     private TestEventKafkaHandler testEventKafkaHandler;
 
+    @Value("${kafka.enable}")
+    boolean kafkaEnabled;
+
     @PostConstruct
     public void initKafka() {
-        KafkaNotifierRun kafkaNotifierRun = new KafkaNotifierRun(consumer, kafkaConfig);
-        KafkaConsumerRun kafkaConsumerRun = new KafkaConsumerRun(consumer, kafkaConfig);
-        kafkaConsumerRun.addKafkaHandler(testEventKafkaHandler);
+        if (kafkaEnabled) {
+            KafkaNotifierRun kafkaNotifierRun = new KafkaNotifierRun(consumer, kafkaConfig);
+            KafkaConsumerRun kafkaConsumerRun = new KafkaConsumerRun(consumer, kafkaConfig);
+            kafkaConsumerRun.addKafkaHandler(testEventKafkaHandler);
 
-        executorService.submit(kafkaNotifierRun);
-        executorService.submit(kafkaConsumerRun);
+            executorService.submit(kafkaNotifierRun);
+            executorService.submit(kafkaConsumerRun);
+        }
     }
 }

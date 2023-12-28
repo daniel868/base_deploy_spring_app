@@ -6,5 +6,10 @@ import java.util.List;
 
 public interface UserService {
     User addUser(String username);
-    List<User>geUsers();
+
+    List<User> geUsers();
+
+    User updateUser(User user);
+
+    User findUserById(Long id);
 }

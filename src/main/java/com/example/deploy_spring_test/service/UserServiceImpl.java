@@ -39,4 +39,15 @@ public class UserServiceImpl implements UserService {
         logger.debug("Loading all users from database");
         return userRepository.findAll();
     }
+
+    @Override
+    public User updateUser(User user) {
+        user.setUpdatedDate(new Date());
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User findUserById(Long id) {
+        return userRepository.findById(id).orElse(null);
+    }
 }

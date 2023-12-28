@@ -4,8 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
-import java.util.Objects;
+import java.util.*;
 
 @Entity(name = "ma_user")
 @Getter
@@ -23,6 +22,28 @@ public class User {
     @Column(name = "updated_date")
     private Date updatedDate;
 
+    /*
+        mapping from the other side, one directional mapping,
+        it will create a new table for car and user
+
+        the ownership of the relation -> where the foreign key is
+
+        @JoinColumn(name = "post_id") - used for one directional mapping
+        for eliminating the joining table on this one-to-many relationship
+
+        for directional mapping, it's not need to use JoinColumn - just use mappedBy on the opposite
+        side of the relationship
+     */
+    @OneToMany
+    @JoinColumn(name = "post_id")
+    private Set<Car> usersCars;
+
+    /*
+    one to many bidirectional size
+     */
+    @OneToMany(mappedBy = "user")
+    private Set<Comment> usersComment;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -34,6 +55,20 @@ public class User {
     @Override
     public int hashCode() {
         return Objects.hash(id, username, createdDate, updatedDate);
+    }
+
+    public void addNewCar(Car car) {
+        if (usersCars == null) {
+            usersCars = new HashSet<>();
+        }
+        usersCars.add(car);
+    }
+
+    public void addNewComment(Comment comment) {
+        if (usersComment == null) {
+            usersComment = new HashSet<>();
+        }
+        usersComment.add(comment);
     }
 
     @Override
