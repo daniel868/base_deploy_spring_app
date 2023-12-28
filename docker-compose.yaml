@@ -1,17 +1,17 @@
 services:
-  db:
+  db_container:
     container_name: db_container
     image: postgres
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
-      PGDATA: /data/postgres
+      POSTGRES_DB: test_db
     volumes:
-      - postgres:/data/postgres
+      - /init-db.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
     networks:
-      - postgres
+      - db_container
     restart: unless-stopped
 
   api:
@@ -21,13 +21,13 @@ services:
       - SPRING_PROFILES_ACTIVE=dev
     ports:
       - "8080:8080"
+    networks:
+      - db_container
     depends_on:
-      - db
+      - db_container
 
 
 networks:
-  postgres:
+  db_container:
     driver: bridge
 
-volumes:
-  postgres:
